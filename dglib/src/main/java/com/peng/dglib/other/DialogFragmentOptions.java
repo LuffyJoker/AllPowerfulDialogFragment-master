@@ -10,7 +10,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.StyleRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +18,11 @@ import com.peng.dglib.BaseDialogFragment;
 import com.peng.dglib.R;
 import com.peng.dglib.utils.CalculateUtils;
 
-import java.lang.reflect.Field;
-
 /**
  * Created by Mr.Q on 2019/3/5
- * 描述：dialogFragment 的属性设置
+ * 描述：
+ *      1、dialogFragment 的属性设置
+ *      2、Parceable 是因为要在状态变化的时候保存 Fragment 的状态
  */
 public class DialogFragmentOptions implements Parcelable {
 
@@ -37,83 +36,6 @@ public class DialogFragmentOptions implements Parcelable {
      * dialog 样式
      */
     public int dialogStyle = DialogFragment.STYLE_NO_TITLE;
-
-    public DialogFragmentOptions() {
-    }
-
-    protected DialogFragmentOptions(Parcel in) {
-        layoutId = in.readInt();
-        dialogStyle = in.readInt();
-        allowingStateLoss = in.readByte() != 0;
-        commitNow = in.readByte() != 0;
-        animStyle = in.readInt();
-        canClick = in.readByte() != 0;
-        isLazy = in.readByte() != 0;
-        duration = in.readLong();
-        dialogStatusBarColor = in.readInt();
-        width = in.readInt();
-        height = in.readInt();
-        isFullHorizontal = in.readByte() != 0;
-        isFullVertical = in.readByte() != 0;
-        isFullVerticalOverStatusBar = in.readByte() != 0;
-        verticalMargin = in.readFloat();
-        horizontalMargin = in.readFloat();
-        fullVerticalMargin = in.readInt();
-        fullHorizontalMargin = in.readInt();
-        dimAmount = in.readFloat();
-        dialogViewX = in.readInt();
-        dialogViewY = in.readInt();
-        offsetX = in.readInt();
-        offsetY = in.readInt();
-        touchCancel = in.readByte() != 0;
-        backCancel = in.readByte() != 0;
-        asView = in.readByte() != 0;
-    }
-
-    public static final Creator<DialogFragmentOptions> CREATOR = new Creator<DialogFragmentOptions>() {
-        @Override
-        public DialogFragmentOptions createFromParcel(Parcel in) {
-            return new DialogFragmentOptions(in);
-        }
-
-        @Override
-        public DialogFragmentOptions[] newArray(int size) {
-            return new DialogFragmentOptions[size];
-        }
-    };
-
-    /**
-     * 设置对话框的主题样式（如果有其他需求可重写该方法），不对模块外暴露
-     *
-     * @param baseDialogFragment
-     */
-    protected void setDialogTheme(BaseDialogFragment baseDialogFragment) {
-        AppCompatActivity appCompatActivity = baseDialogFragment.getAppCompatActivity();
-        //如果activity(是/否)占满全屏并且依旧保留状态栏（沉浸式状态栏）
-        if (appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                || appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE)) {
-            dialogStyle = R.style.BaseDialogFullScreen;
-        } else {
-            dialogStyle = R.style.BaseDialog;
-        }
-    }
-
-    /**
-     * 获取对话框的主题
-     *
-     * @param baseDialogFragment
-     * @return
-     */
-    public int getDialogTheme(BaseDialogFragment baseDialogFragment) {
-        AppCompatActivity appCompatActivity = baseDialogFragment.getAppCompatActivity();
-        // 如果 activity (是/否)占满全屏并且依旧保留状态栏（沉浸式状态栏）
-        if (appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                || appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE)) {
-            return R.style.BaseDialogFullScreen;
-        } else {
-            return dialogStyle = R.style.BaseDialog;
-        }
-    }
 
     /**
      * 是否允许状态丢失
@@ -291,6 +213,92 @@ public class DialogFragmentOptions implements Parcelable {
      */
     public void removeAsView() {
         asView = false;
+    }
+
+    /**
+     * 按钮事件监听
+     */
+    public DialogInterface.OnKeyListener mOnKeyListener;
+
+    public void setOnKeyListener(DialogInterface.OnKeyListener onKeyListener) {
+        mOnKeyListener = onKeyListener;
+    }
+
+    public DialogFragmentOptions() {
+    }
+
+    protected DialogFragmentOptions(Parcel in) {
+        layoutId = in.readInt();
+        dialogStyle = in.readInt();
+        allowingStateLoss = in.readByte() != 0;
+        commitNow = in.readByte() != 0;
+        animStyle = in.readInt();
+        canClick = in.readByte() != 0;
+        isLazy = in.readByte() != 0;
+        duration = in.readLong();
+        dialogStatusBarColor = in.readInt();
+        width = in.readInt();
+        height = in.readInt();
+        isFullHorizontal = in.readByte() != 0;
+        isFullVertical = in.readByte() != 0;
+        isFullVerticalOverStatusBar = in.readByte() != 0;
+        verticalMargin = in.readFloat();
+        horizontalMargin = in.readFloat();
+        fullVerticalMargin = in.readInt();
+        fullHorizontalMargin = in.readInt();
+        dimAmount = in.readFloat();
+        dialogViewX = in.readInt();
+        dialogViewY = in.readInt();
+        offsetX = in.readInt();
+        offsetY = in.readInt();
+        touchCancel = in.readByte() != 0;
+        backCancel = in.readByte() != 0;
+        asView = in.readByte() != 0;
+    }
+
+    public static final Creator<DialogFragmentOptions> CREATOR = new Creator<DialogFragmentOptions>() {
+        @Override
+        public DialogFragmentOptions createFromParcel(Parcel in) {
+            return new DialogFragmentOptions(in);
+        }
+
+        @Override
+        public DialogFragmentOptions[] newArray(int size) {
+            return new DialogFragmentOptions[size];
+        }
+    };
+
+    /**
+     * 设置对话框的主题样式（如果有其他需求可重写该方法），不对模块外暴露
+     *
+     * @param baseDialogFragment
+     */
+    protected void setDialogTheme(BaseDialogFragment baseDialogFragment) {
+        AppCompatActivity appCompatActivity = baseDialogFragment.getAppCompatActivity();
+        //如果activity(是/否)占满全屏并且依旧保留状态栏（沉浸式状态栏）
+        if (appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                || appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE)) {
+            dialogStyle = R.style.BaseDialogFullScreen;
+        } else {
+            dialogStyle = R.style.BaseDialog;
+        }
+    }
+
+    /**
+     * 获取对话框的主题
+     *
+     * @param baseDialogFragment
+     * @return
+     */
+    public int getDialogTheme(BaseDialogFragment baseDialogFragment) {
+        AppCompatActivity appCompatActivity = baseDialogFragment.getAppCompatActivity();
+        // 如果 activity (是/否)占满全屏并且依旧保留状态栏（沉浸式状态栏）
+        if (appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                || appCompatActivity.getWindow().getDecorView().getSystemUiVisibility() == (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE)) {
+            return R.style.BaseDialogFullScreen;
+        } else {
+            return dialogStyle = R.style.BaseDialog;
+        }
     }
 
     /**
@@ -655,15 +663,6 @@ public class DialogFragmentOptions implements Parcelable {
         } else {//4.4 全透明状态栏
             baseDialogFragment.getDialog().getWindow().addFlags(baseDialogFragment.getAppCompatActivity().getWindow().getAttributes().flags);
         }
-    }
-
-    /**
-     * 按钮事件监听
-     */
-    public DialogInterface.OnKeyListener mOnKeyListener;
-
-    public void setOnKeyListener(DialogInterface.OnKeyListener onKeyListener) {
-        mOnKeyListener = onKeyListener;
     }
 
     @Override
