@@ -421,6 +421,50 @@ public class BaseDialogFragment extends DialogFragment {
     }
 
     /**
+     * 将 dialog 显示在屏幕位置
+     *
+     * @param manager
+     * @param gravity 对话框显示的位置
+     * @return
+     */
+    public BaseDialogFragment showOnWindow(FragmentManager manager, DialogGravity gravity) {
+        return showOnWindow(manager, gravity, getDialogFragmentOptions().animStyle, null, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * 将 dialog 显示在屏幕位置
+     *
+     * @param manager
+     * @param newAnim
+     * @return
+     */
+    public BaseDialogFragment showOnWindow(FragmentManager manager, int newAnim) {
+        return showOnWindow(manager, getDialogFragmentOptions().gravityAsWindow, newAnim, null, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * 将 dialog 显示在屏幕位置
+     *
+     * @param manager
+     * @param gravity 对话框显示的位置
+     * @return
+     */
+    public BaseDialogFragment showOnWindow(FragmentManager manager, DialogGravity gravity, int newAnim) {
+        return showOnWindow(manager, gravity, newAnim, null, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * 将 dialog 显示在屏幕位置
+     *
+     * @param manager
+     * @param gravity 对话框显示的位置
+     * @return
+     */
+    public BaseDialogFragment showOnWindow(FragmentManager manager, DialogGravity gravity, int newAnim, String tag) {
+        return showOnWindow(manager, gravity, newAnim, tag, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
      * 显示 DialogFragment
      *
      * @param manager           管理器
@@ -443,6 +487,7 @@ public class BaseDialogFragment extends DialogFragment {
 
     /**
      * DialogFragment 显示在 View 的某个位置
+     *
      * @param manager
      * @param view
      * @return
@@ -453,6 +498,7 @@ public class BaseDialogFragment extends DialogFragment {
 
     /**
      * DialogFragment 显示在 View 的某个位置
+     *
      * @param manager
      * @param view
      * @param tag
@@ -460,6 +506,67 @@ public class BaseDialogFragment extends DialogFragment {
      */
     public BaseDialogFragment showOnView(FragmentManager manager, View view, String tag) {
         return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, getDialogFragmentOptions().animStyle, tag, getDialogFragmentOptions().offsetX, getDialogFragmentOptions().offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * DialogFragment 显示在 View 的某个位置
+     *
+     * @param manager
+     * @param view
+     * @param offsetX 偏移量
+     * @param offsetY 偏移量
+     * @return
+     */
+    public BaseDialogFragment showOnView(FragmentManager manager, View view, int offsetX, int offsetY) {
+        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, getDialogFragmentOptions().animStyle, null, offsetX, offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * DialogFragment 显示在 View 的某个位置
+     *
+     * @param manager
+     * @param view
+     * @param animStyle
+     * @return
+     */
+    public BaseDialogFragment showOnView(FragmentManager manager, View view, int animStyle) {
+        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, null, getDialogFragmentOptions().offsetX, getDialogFragmentOptions().offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * DialogFragment 显示在 View 的某个位置
+     *
+     * @param manager
+     * @param view
+     * @param animStyle
+     * @return
+     */
+    public BaseDialogFragment showOnView(FragmentManager manager, View view, int animStyle, int offsetX, int offsetY) {
+        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, null, offsetX, offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * DialogFragment 显示在 View 的某个位置
+     *
+     * @param manager
+     * @param view
+     * @param animStyle
+     * @return
+     */
+    public BaseDialogFragment showOnView(FragmentManager manager, View view, String tag, int animStyle) {
+        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, tag, getDialogFragmentOptions().offsetX, getDialogFragmentOptions().offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+    }
+
+    /**
+     * DialogFragment 显示在 View 的某个位置
+     *
+     * @param manager
+     * @param view
+     * @param animStyle
+     * @return
+     */
+    public BaseDialogFragment showOnView(FragmentManager manager, View view, String tag, int animStyle, int offsetX, int offsetY) {
+        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, tag, offsetX, offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
     }
 
     /**
