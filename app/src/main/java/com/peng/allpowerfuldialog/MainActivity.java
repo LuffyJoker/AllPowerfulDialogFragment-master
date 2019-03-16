@@ -1,19 +1,13 @@
 package com.peng.allpowerfuldialog;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.ConvertUtils;
-import com.blankj.utilcode.util.ScreenUtils;
+import com.peng.allpowerfuldialog.dialog.MsgDialog;
 import com.peng.dglib.BaseDialogFragment;
-import com.peng.dglib.listener.DialogListener;
-import com.peng.dglib.other.DialogFragmentOptions;
 import com.peng.dglib.other.DialogGravity;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,8 +22,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);//隐藏标题栏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
 
         setContentView(R.layout.activity_main);
+
+    }
+
+    public void showDialog(View view) {
+
+//        MsgDialog msgDialog = new MsgDialog();
+//        msgDialog.showOnView(getSupportFragmentManager(),view);
+
+        new MsgDialog.Builder()
+                .setLayoutId(R.layout.dialog_two_btn)
+                .asView(true)
+                .setGravityAsView(DialogGravity.BOTTOM_ALIGN_RIGHT)
+                .setWidth(50)
+                .setHeight(50)
+                .setDimAmount(0.5f)
+                .build().showOnView(getSupportFragmentManager(), view);
+
     }
 }

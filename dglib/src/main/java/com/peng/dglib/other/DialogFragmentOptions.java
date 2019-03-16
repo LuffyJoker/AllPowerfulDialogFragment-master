@@ -21,8 +21,8 @@ import com.peng.dglib.utils.CalculateUtils;
 /**
  * Created by Mr.Q on 2019/3/5
  * 描述：
- *      1、dialogFragment 的属性设置
- *      2、Parceable 是因为要在状态变化的时候保存 Fragment 的状态
+ * 1、dialogFragment 的属性设置
+ * 2、Parceable 是因为要在状态变化的时候保存 Fragment 的状态
  */
 public class DialogFragmentOptions implements Parcelable {
 
@@ -139,7 +139,7 @@ public class DialogFragmentOptions implements Parcelable {
     public float horizontalMargin = 0f;
 
     /**
-     * 以下两个margin分别用于横纵向占满的情况
+     * 以下两个 margin 分别用于横纵向占满的情况
      * 垂直方向上顶部和底部的margin 单位： px
      */
     public int fullVerticalMargin = 0;
@@ -150,7 +150,7 @@ public class DialogFragmentOptions implements Parcelable {
     public int fullHorizontalMargin = 0;
 
     /**
-     * 灰度深浅
+     * 灰度深浅，值越大，背景灰度越深
      */
     public float dimAmount = 0.3f;
 
@@ -162,7 +162,7 @@ public class DialogFragmentOptions implements Parcelable {
     /**
      * 当 dialog 依附于 view 时的位置（默认在下方居中）
      */
-    public DialogGravity gravityAsView = DialogGravity.CENTER_CENTER;
+    public DialogGravity gravityAsView = DialogGravity.CENTER_BOTTOM;
 
     /**
      * x轴坐标值，用于特殊动画时定位dialog
@@ -578,6 +578,95 @@ public class DialogFragmentOptions implements Parcelable {
                 }
                 dialogViewX = viewX + viewWidth + offsetX;
                 dialogViewY = viewY + viewHeight + offsetY;
+                break;
+            case LEFT_ALIGN_BOTTOM:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX100Y100;
+                }
+                if (width != 0) {
+                    dialogViewX = viewX - width + offsetX;
+                } else {
+                    dialogViewX = viewX - dialogViewWidth + offsetX;
+                }
+                if (height != 0) {
+                    dialogViewY = viewY - height + offsetY + viewHeight;
+                } else {
+                    dialogViewY = viewY - dialogViewHeight + offsetY + viewHeight;
+                }
+                break;
+            case LEFT_ALIGN_TOP:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX100Y0;
+                }
+                if (width != 0) {
+                    dialogViewX = viewX - width;
+                } else {
+                    dialogViewX = viewX - (dialogViewWidth + offsetX);
+                }
+                dialogViewY = viewY + offsetY;
+                break;
+            case TOP_ALIGN_LEFT:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX0Y100;
+                }
+                this.dialogViewX = viewX + offsetX;
+                if (height != 0) {
+                    dialogViewY = viewY - height + offsetY;
+                } else {
+                    dialogViewY = viewY - dialogViewHeight + offsetY;
+                }
+                break;
+            case TOP_ALIGN_RIGHT:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX100Y100;
+                }
+                if (width != 0) {
+                    dialogViewX = viewX - width + offsetX + viewWidth;
+                } else {
+                    dialogViewX = viewX - dialogViewWidth + offsetX + viewWidth;
+                }
+                if (height != 0) {
+                    dialogViewY = viewY - height + offsetY;
+                } else {
+                    dialogViewY = viewY - dialogViewHeight + offsetY;
+                }
+                break;
+            case BOTTOM_ALIGN_LEFT:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX0Y0;
+                }
+                dialogViewX = viewX + offsetX;
+                dialogViewY = viewY + viewHeight + offsetY;
+                break;
+            case BOTTOM_ALIGN_RIGHT:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX100Y0;
+                }
+                if (width != 0) {
+                    dialogViewX = viewX - width + viewWidth;
+                } else {
+                    dialogViewX = viewX - (dialogViewWidth + offsetX) + viewWidth;
+                }
+                dialogViewY = viewY + viewHeight + offsetY;
+                break;
+            case RIGHT_ALIGN_TOP:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX0Y0;
+                }
+                dialogViewX = viewX + viewWidth + offsetX;
+                dialogViewY = viewY + offsetY;
+                break;
+
+            case RIGHT_ALIGN_BOTTOM:
+                if (animStyle == 0) {
+                    animStyle = R.style.ScaleOverShootEnterExitAnimationX0Y100;
+                }
+                this.dialogViewX = viewX + viewWidth + offsetX;
+                if (height != 0) {
+                    dialogViewY = viewY - height + offsetY + viewHeight;
+                } else {
+                    dialogViewY = viewY - dialogViewHeight + offsetY + +viewHeight;
+                }
                 break;
             default:
                 if (animStyle == 0) {

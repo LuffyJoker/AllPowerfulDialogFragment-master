@@ -1,7 +1,6 @@
 package com.peng.dglib;
 
 import android.animation.Animator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
@@ -13,7 +12,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,6 +84,10 @@ public class BaseDialogFragment extends DialogFragment {
         return dialogFragmentOptions;
     }
 
+    private void setDialogFragmentOptions(DialogFragmentOptions dialogFragmentOptions) {
+        this.dialogFragmentOptions = dialogFragmentOptions;
+    }
+
 
     /**
      * 懒加载，根据 mDialogOptions.duration 来延迟加载实现懒加载（曲线救国）
@@ -101,9 +103,9 @@ public class BaseDialogFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 根据compile和runtime提供者更新属性
-        if (getDialogFragmentOptions() != null) {
+        if (dialogFragmentOptions != null) {
             // 设置 dialog 样式
-            setStyle(getDialogFragmentOptions().dialogStyle, getDialogFragmentOptions().getDialogTheme(this));
+            setStyle(dialogFragmentOptions.dialogStyle, dialogFragmentOptions.getDialogTheme(this));
         }
         // 恢复保存的配置
         if (savedInstanceState != null) {
@@ -121,8 +123,8 @@ public class BaseDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //加载布局
-        rootView = inflater.inflate(getDialogFragmentOptions().layoutId, container, false);
-        if (!getDialogFragmentOptions().isLazy) {
+        rootView = inflater.inflate(dialogFragmentOptions.layoutId, container, false);
+        if (!dialogFragmentOptions.isLazy) {
             convertView(new ViewHolder(rootView), this);
         } else {
             //懒加载
@@ -131,7 +133,7 @@ public class BaseDialogFragment extends DialogFragment {
                 public void run() {
                     onLazy();
                 }
-            }, getDialogFragmentOptions().duration);
+            }, dialogFragmentOptions.duration);
         }
         return rootView;
     }
@@ -140,7 +142,7 @@ public class BaseDialogFragment extends DialogFragment {
      * 数据绑定到视图/视图控件监听等
      */
     private void convertView(ViewHolder holder, BaseDialogFragment dialogFragment) {
-//        getDialogFragmentOptions().convertListener.convertView(holder, dialogFragment);
+//        dialogFragmentOptions.convertListener.convertView(holder, dialogFragment);
     }
 
     /**
@@ -162,7 +164,7 @@ public class BaseDialogFragment extends DialogFragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(options, getDialogFragmentOptions());
+        outState.putParcelable(options, dialogFragmentOptions);
     }
 
     /**
@@ -171,18 +173,18 @@ public class BaseDialogFragment extends DialogFragment {
     @Override
     public void dismiss() {
         //如果没自定义的 view 动画，那么直接执行
-        if (getDialogFragmentOptions().exitAnimator == null) {
+        if (dialogFragmentOptions.exitAnimator == null) {
             //如果没有执行过监听操作才执行，并且把监听设为已执行状态
             if (dismissed.compareAndSet(false, true)) {
                 executeDismissListener();
-                if (getDialogFragmentOptions().allowingStateLoss) {
+                if (dialogFragmentOptions.allowingStateLoss) {
                     dismissAllowingStateLoss();
                 } else {
                     dismiss();
                 }
             } else {//如果有动画
                 //直接执行动画，该动画已经设置过监听，将会在结束动画时调用super.dismiss()方法
-                getDialogFragmentOptions().exitAnimator.start();
+                dialogFragmentOptions.exitAnimator.start();
             }
         }
     }
@@ -234,12 +236,12 @@ public class BaseDialogFragment extends DialogFragment {
         animatorEnterListener = new AnimatorListener().onAnimatorStart(new OnAnimatorStartListener() {
             @Override
             public void animatorStart(Animator animator) {
-                getDialogFragmentOptions().canClick = false;
+                dialogFragmentOptions.canClick = false;
             }
         }).onAnimatorEnd(new OnAnimatorEndListener() {
             @Override
             public void animatorEnd(Animator animator) {
-                getDialogFragmentOptions().canClick = true;
+                dialogFragmentOptions.canClick = true;
             }
         });
         return animatorEnterListener;
@@ -253,7 +255,7 @@ public class BaseDialogFragment extends DialogFragment {
         animatorExitListener = new AnimatorListener().onAnimatorStart(new OnAnimatorStartListener() {
             @Override
             public void animatorStart(Animator animator) {
-                getDialogFragmentOptions().canClick = false;
+                dialogFragmentOptions.canClick = false;
             }
         }).onAnimatorEnd(new OnAnimatorEndListener() {
             @Override
@@ -261,13 +263,13 @@ public class BaseDialogFragment extends DialogFragment {
                 //退出动画结束时调用super.dismiss()
                 if (dismissed.compareAndSet(false, true)) {
                     executeDismissListener();
-                    if (getDialogFragmentOptions().allowingStateLoss) {
+                    if (dialogFragmentOptions.allowingStateLoss) {
                         dismissAllowingStateLoss();
                     } else {
                         dismiss();
                     }
                 }
-                getDialogFragmentOptions().canClick = true;
+                dialogFragmentOptions.canClick = true;
             }
         });
         return animatorExitListener;
@@ -280,92 +282,92 @@ public class BaseDialogFragment extends DialogFragment {
         // 设置 dialog 的初始化数据
         if (getDialog().getWindow() != null) {
             // 设置 dialog 显示时，布局中 view 的自定义动画
-            if (getDialogFragmentOptions().enterAnimator != null) {
-                getDialogFragmentOptions().enterAnimator.setTarget(getDialog().getWindow().getDecorView().findViewById(android.R.id.content));
-                getDialogFragmentOptions().enterAnimator.addListener(initAnimatorEnterListener());
+            if (dialogFragmentOptions.enterAnimator != null) {
+                dialogFragmentOptions.enterAnimator.setTarget(getDialog().getWindow().getDecorView().findViewById(android.R.id.content));
+                dialogFragmentOptions.enterAnimator.addListener(initAnimatorEnterListener());
             }
             // 设置 dialog 隐藏时，布局中 view 的自定义动画
-            if (getDialogFragmentOptions().exitAnimator != null) {
-                getDialogFragmentOptions().exitAnimator.setTarget(getDialog().getWindow().getDecorView().findViewById(android.R.id.content));
-                getDialogFragmentOptions().exitAnimator.addListener(initAnimatorExitListener());
+            if (dialogFragmentOptions.exitAnimator != null) {
+                dialogFragmentOptions.exitAnimator.setTarget(getDialog().getWindow().getDecorView().findViewById(android.R.id.content));
+                dialogFragmentOptions.exitAnimator.addListener(initAnimatorExitListener());
             }
             // 设置 dialog 的 statusBarColor
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getDialog().getWindow().setStatusBarColor(getDialogFragmentOptions().dialogStatusBarColor);
+                getDialog().getWindow().setStatusBarColor(dialogFragmentOptions.dialogStatusBarColor);
             }
             // 设置 dialog 的 statusBar 的显示模式
-            getDialogFragmentOptions().setDialogFragmentStatusBarMode(this);
+            dialogFragmentOptions.setDialogFragmentStatusBarMode(this);
 
             // 设置 window 属性
             WindowManager.LayoutParams layoutParams = getDialog().getWindow().getAttributes();
             if (layoutParams != null) {
-                layoutParams.dimAmount = getDialogFragmentOptions().dimAmount;
+                layoutParams.dimAmount = dialogFragmentOptions.dimAmount;
 
                 // 设置 dialog 宽度
-                if (getDialogFragmentOptions().width == 0) {
+                if (dialogFragmentOptions.width == 0) {
                     layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
                 } else {
-                    layoutParams.width = getDialogFragmentOptions().width;
+                    layoutParams.width = dialogFragmentOptions.width;
                 }
 
                 // 设置 dialog 高度
-                if (getDialogFragmentOptions().height == 0) {
+                if (dialogFragmentOptions.height == 0) {
                     layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
                 } else {
-                    layoutParams.height = getDialogFragmentOptions().height;
+                    layoutParams.height = dialogFragmentOptions.height;
                 }
 
                 // 当左右占满时，设置左右两边的平均边距
-                if (getDialogFragmentOptions().isFullHorizontal) {
+                if (dialogFragmentOptions.isFullHorizontal) {
                     layoutParams.horizontalMargin = 0f;
-                    layoutParams.width = CalculateUtils.getScreenWidth(getResources()) - 2 * getDialogFragmentOptions().fullHorizontalMargin;
+                    layoutParams.width = CalculateUtils.getScreenWidth(getResources()) - 2 * dialogFragmentOptions.fullHorizontalMargin;
                 } else {
                     //没有占满的时候，设置水平方向的相对边距
-                    if (getDialogFragmentOptions().horizontalMargin < 0) {
+                    if (dialogFragmentOptions.horizontalMargin < 0) {
                         layoutParams.horizontalMargin = 0f;
-                    } else if (getDialogFragmentOptions().horizontalMargin < 0 && getDialogFragmentOptions().horizontalMargin < 1) {
-                        layoutParams.horizontalMargin = getDialogFragmentOptions().horizontalMargin;
+                    } else if (dialogFragmentOptions.horizontalMargin < 0 && dialogFragmentOptions.horizontalMargin < 1) {
+                        layoutParams.horizontalMargin = dialogFragmentOptions.horizontalMargin;
                     } else {
-                        layoutParams.horizontalMargin = getDialogFragmentOptions().horizontalMargin / CalculateUtils.getScreenWidth(getResources());
+                        layoutParams.horizontalMargin = dialogFragmentOptions.horizontalMargin / CalculateUtils.getScreenWidth(getResources());
                     }
                 }
 
                 //（不包含statusBar）当上下占满时，设置上下的平均边距
-                if (getDialogFragmentOptions().isFullVertical) {
+                if (dialogFragmentOptions.isFullVertical) {
                     layoutParams.verticalMargin = 0f;
-                    layoutParams.height = CalculateUtils.getScreenHeight(getResources()) - 2 * getDialogFragmentOptions().fullVerticalMargin;
+                    layoutParams.height = CalculateUtils.getScreenHeight(getResources()) - 2 * dialogFragmentOptions.fullVerticalMargin;
                 } else {
                     //没有占满的时候，设置水平方向的相对边距
-                    if (getDialogFragmentOptions().verticalMargin < 0) {
+                    if (dialogFragmentOptions.verticalMargin < 0) {
                         layoutParams.verticalMargin = 0f;
-                    } else if (getDialogFragmentOptions().verticalMargin > 0 && getDialogFragmentOptions().verticalMargin < 1) {
-                        layoutParams.verticalMargin = getDialogFragmentOptions().verticalMargin;
+                    } else if (dialogFragmentOptions.verticalMargin > 0 && dialogFragmentOptions.verticalMargin < 1) {
+                        layoutParams.verticalMargin = dialogFragmentOptions.verticalMargin;
                     } else {
-                        layoutParams.verticalMargin = getDialogFragmentOptions().verticalMargin / CalculateUtils.getScreenHeight(getResources());
+                        layoutParams.verticalMargin = dialogFragmentOptions.verticalMargin / CalculateUtils.getScreenHeight(getResources());
                     }
                 }
 
                 //（包含StatusBar）真正的全屏
-                if (getDialogFragmentOptions().isFullVerticalOverStatusBar) {
+                if (dialogFragmentOptions.isFullVerticalOverStatusBar) {
                     layoutParams.verticalMargin = 0f;
-                    layoutParams.height = CalculateUtils.getScreenHeightOverStatusBar(mActivity) - 2 * getDialogFragmentOptions().fullVerticalMargin;
+                    layoutParams.height = CalculateUtils.getScreenHeightOverStatusBar(mActivity) - 2 * dialogFragmentOptions.fullVerticalMargin;
                 }
                 // 设置位置(如果设置了 asView, 那么 gravity 则永远为 LEFT_TOP )
-                layoutParams.gravity = getDialogFragmentOptions().gravityAsWindow.getLayoutGravity();
-                layoutParams.windowAnimations = getDialogFragmentOptions().animStyle;
+                layoutParams.gravity = dialogFragmentOptions.gravityAsWindow.getLayoutGravity();
+                layoutParams.windowAnimations = dialogFragmentOptions.animStyle;
                 //如果设置了asView，那么设置 dialog 的 x，y 值，将 dialog 显示在 view 附近
-                if (getDialogFragmentOptions().isAsView()) {
-                    layoutParams.x = getDialogFragmentOptions().dialogViewX;
-                    layoutParams.y = getDialogFragmentOptions().dialogViewY;
+                if (dialogFragmentOptions.isAsView()) {
+                    layoutParams.x = dialogFragmentOptions.dialogViewX;
+                    layoutParams.y = dialogFragmentOptions.dialogViewY;
                 }
             }
             getDialog().getWindow().setAttributes(layoutParams);
         }
 
         //设置是否点击外部不消失
-        setCancelable(getDialogFragmentOptions().backCancel);
+        setCancelable(dialogFragmentOptions.backCancel);
         //设置是否点击屏幕区域不消失（点击返回键可消失）
-        getDialog().setCanceledOnTouchOutside(getDialogFragmentOptions().touchCancel);
+        getDialog().setCanceledOnTouchOutside(dialogFragmentOptions.touchCancel);
         //设置按键拦截事件，一般在全屏显示需要重写返回键时用到
         setOnKeyListener();
     }
@@ -376,12 +378,12 @@ public class BaseDialogFragment extends DialogFragment {
     private void setOnKeyListener() {
 
         //如果设置过特殊的动画，并且没有设置返回建的监听，那么默认设置一个返回键的监听
-        if (getDialogFragmentOptions().exitAnimator != null && getDialogFragmentOptions().mOnKeyListener == null) {
+        if (dialogFragmentOptions.exitAnimator != null && dialogFragmentOptions.mOnKeyListener == null) {
             DialogInterface.OnKeyListener onKey = new DialogInterface.OnKeyListener() {
                 @Override
                 public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        if (getDialogFragmentOptions().canClick) {
+                        if (dialogFragmentOptions.canClick) {
                             dismiss();
                             return true;
                         } else {
@@ -394,8 +396,8 @@ public class BaseDialogFragment extends DialogFragment {
             getDialog().setOnKeyListener(onKey);
         } else {
             //如果不是特殊动画，或者用户自定义了OnKeyListener，那么直接将 onKeyListener 设置
-            if (getDialogFragmentOptions().mOnKeyListener != null) {
-                getDialog().setOnKeyListener(getDialogFragmentOptions().mOnKeyListener);
+            if (dialogFragmentOptions.mOnKeyListener != null) {
+                getDialog().setOnKeyListener(dialogFragmentOptions.mOnKeyListener);
             }
         }
     }
@@ -407,7 +409,7 @@ public class BaseDialogFragment extends DialogFragment {
      * @return
      */
     public BaseDialogFragment showOnWindow(FragmentManager manager) {
-        return showOnWindow(manager, getDialogFragmentOptions().gravityAsWindow, getDialogFragmentOptions().animStyle, null, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        return showOnWindow(manager, dialogFragmentOptions.gravityAsWindow, dialogFragmentOptions.animStyle, null, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -417,7 +419,7 @@ public class BaseDialogFragment extends DialogFragment {
      * @return
      */
     public BaseDialogFragment showOnWindow(FragmentManager manager, String tag) {
-        return showOnWindow(manager, getDialogFragmentOptions().gravityAsWindow, getDialogFragmentOptions().animStyle, tag, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        return showOnWindow(manager, dialogFragmentOptions.gravityAsWindow, dialogFragmentOptions.animStyle, tag, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -428,7 +430,7 @@ public class BaseDialogFragment extends DialogFragment {
      * @return
      */
     public BaseDialogFragment showOnWindow(FragmentManager manager, DialogGravity gravity) {
-        return showOnWindow(manager, gravity, getDialogFragmentOptions().animStyle, null, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        return showOnWindow(manager, gravity, dialogFragmentOptions.animStyle, null, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -439,7 +441,7 @@ public class BaseDialogFragment extends DialogFragment {
      * @return
      */
     public BaseDialogFragment showOnWindow(FragmentManager manager, int newAnim) {
-        return showOnWindow(manager, getDialogFragmentOptions().gravityAsWindow, newAnim, null, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        return showOnWindow(manager, dialogFragmentOptions.gravityAsWindow, newAnim, null, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -450,7 +452,7 @@ public class BaseDialogFragment extends DialogFragment {
      * @return
      */
     public BaseDialogFragment showOnWindow(FragmentManager manager, DialogGravity gravity, int newAnim) {
-        return showOnWindow(manager, gravity, newAnim, null, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        return showOnWindow(manager, gravity, newAnim, null, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -461,7 +463,7 @@ public class BaseDialogFragment extends DialogFragment {
      * @return
      */
     public BaseDialogFragment showOnWindow(FragmentManager manager, DialogGravity gravity, int newAnim, String tag) {
-        return showOnWindow(manager, gravity, newAnim, tag, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        return showOnWindow(manager, gravity, newAnim, tag, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -477,10 +479,10 @@ public class BaseDialogFragment extends DialogFragment {
      */
     public BaseDialogFragment showOnWindow(FragmentManager manager, DialogGravity gravity, int newAnim, String tag, boolean allowingStateLoss, boolean commitNow) {
         executeShowListener();
-        getDialogFragmentOptions().gravityAsWindow = gravity;
-        getDialogFragmentOptions().animStyle = newAnim;
-        getDialogFragmentOptions().removeAsView();
-        getDialogFragmentOptions().loadAnim();
+        dialogFragmentOptions.gravityAsWindow = gravity;
+        dialogFragmentOptions.animStyle = newAnim;
+        dialogFragmentOptions.removeAsView();
+        dialogFragmentOptions.loadAnim();
         show(manager, tag, allowingStateLoss, commitNow);
         return this;
     }
@@ -493,7 +495,10 @@ public class BaseDialogFragment extends DialogFragment {
      * @return
      */
     public BaseDialogFragment showOnView(FragmentManager manager, View view) {
-        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, getDialogFragmentOptions().animStyle, null, getDialogFragmentOptions().offsetX, getDialogFragmentOptions().offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        if (dialogFragmentOptions != null) {
+            dialogFragmentOptions = getDialogFragmentOptions();
+        }
+        return showOnView(manager, view, dialogFragmentOptions.gravityAsView, dialogFragmentOptions.animStyle, null, dialogFragmentOptions.offsetX, dialogFragmentOptions.offsetY, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -501,72 +506,13 @@ public class BaseDialogFragment extends DialogFragment {
      *
      * @param manager
      * @param view
-     * @param tag
      * @return
      */
     public BaseDialogFragment showOnView(FragmentManager manager, View view, String tag) {
-        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, getDialogFragmentOptions().animStyle, tag, getDialogFragmentOptions().offsetX, getDialogFragmentOptions().offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
-    }
-
-    /**
-     * DialogFragment 显示在 View 的某个位置
-     *
-     * @param manager
-     * @param view
-     * @param offsetX 偏移量
-     * @param offsetY 偏移量
-     * @return
-     */
-    public BaseDialogFragment showOnView(FragmentManager manager, View view, int offsetX, int offsetY) {
-        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, getDialogFragmentOptions().animStyle, null, offsetX, offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
-    }
-
-    /**
-     * DialogFragment 显示在 View 的某个位置
-     *
-     * @param manager
-     * @param view
-     * @param animStyle
-     * @return
-     */
-    public BaseDialogFragment showOnView(FragmentManager manager, View view, int animStyle) {
-        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, null, getDialogFragmentOptions().offsetX, getDialogFragmentOptions().offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
-    }
-
-    /**
-     * DialogFragment 显示在 View 的某个位置
-     *
-     * @param manager
-     * @param view
-     * @param animStyle
-     * @return
-     */
-    public BaseDialogFragment showOnView(FragmentManager manager, View view, int animStyle, int offsetX, int offsetY) {
-        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, null, offsetX, offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
-    }
-
-    /**
-     * DialogFragment 显示在 View 的某个位置
-     *
-     * @param manager
-     * @param view
-     * @param animStyle
-     * @return
-     */
-    public BaseDialogFragment showOnView(FragmentManager manager, View view, String tag, int animStyle) {
-        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, tag, getDialogFragmentOptions().offsetX, getDialogFragmentOptions().offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
-    }
-
-    /**
-     * DialogFragment 显示在 View 的某个位置
-     *
-     * @param manager
-     * @param view
-     * @param animStyle
-     * @return
-     */
-    public BaseDialogFragment showOnView(FragmentManager manager, View view, String tag, int animStyle, int offsetX, int offsetY) {
-        return showOnView(manager, view, getDialogFragmentOptions().gravityAsView, animStyle, tag, offsetX, offsetY, getDialogFragmentOptions().allowingStateLoss, getDialogFragmentOptions().commitNow);
+        if (dialogFragmentOptions != null) {
+            dialogFragmentOptions = getDialogFragmentOptions();
+        }
+        return showOnView(manager, view, dialogFragmentOptions.gravityAsView, dialogFragmentOptions.animStyle, tag, dialogFragmentOptions.offsetX, dialogFragmentOptions.offsetY, dialogFragmentOptions.allowingStateLoss, dialogFragmentOptions.commitNow);
     }
 
     /**
@@ -580,9 +526,9 @@ public class BaseDialogFragment extends DialogFragment {
      *                      偏移量的定义请看{@link DialogFragmentOptions# dialogAsView(View, DialogGravity, Int, Int, Int) DialogFragmentOptions.dialogAsView}
      * @param offsetY       y轴的偏移量，(默认为上一次设置过的偏移量)
      */
-    public BaseDialogFragment showOnView(FragmentManager manager, View view, DialogGravity gravityAsView, @StyleRes int newAnim, String tag, int offsetX, int offsetY, boolean allowingStateLoss, boolean commitNow) {
+    private BaseDialogFragment showOnView(FragmentManager manager, View view, DialogGravity gravityAsView, @StyleRes int newAnim, String tag, int offsetX, int offsetY, boolean allowingStateLoss, boolean commitNow) {
         executeShowListener();
-        getDialogFragmentOptions().dialogAsView(view, gravityAsView, newAnim, offsetX, offsetY);
+        dialogFragmentOptions.dialogAsView(view, gravityAsView, newAnim, offsetX, offsetY);
         show(manager, tag, allowingStateLoss, commitNow);
         return this;
     }
@@ -602,8 +548,8 @@ public class BaseDialogFragment extends DialogFragment {
             transaction.remove(this);
         }
         transaction.add(this, fragmentTag);
-        getDialogFragmentOptions().allowingStateLoss = allowingStateLoss;
-        getDialogFragmentOptions().commitNow = commitNow;
+        dialogFragmentOptions.allowingStateLoss = allowingStateLoss;
+        dialogFragmentOptions.commitNow = commitNow;
         if (allowingStateLoss) {
             if (commitNow) {
                 transaction.commitNowAllowingStateLoss();
@@ -633,6 +579,116 @@ public class BaseDialogFragment extends DialogFragment {
         } catch (Exception e1) {
             e1.printStackTrace();
             return 75;
+        }
+    }
+
+    /**
+     * 建造者模式，用于快速创建一个对话框
+     */
+    public static class Builder {
+
+        private final DialogFragmentOptions P;
+        private View anchor = null;
+
+        public Builder() {
+            this.P = new DialogFragmentOptions();
+        }
+
+        public BaseDialogFragment.Builder setLayoutId(int layoutId) {
+            this.P.layoutId = layoutId;
+            return this;
+        }
+
+
+        public BaseDialogFragment.Builder setAnimStyle(@StyleRes int animStyle) {
+            this.P.animStyle = animStyle;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setWidth(int width) {
+            this.P.width = width;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setHeight(int height) {
+            this.P.height = height;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder isFullHorizontal(boolean isFullHorizontal) {
+            this.P.isFullHorizontal = isFullHorizontal;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder isFullVertical(boolean isFullVertical) {
+            this.P.isFullVertical = isFullVertical;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder isFullVerticalOverStatusBar(boolean isFullVerticalOverStatusBar) {
+            this.P.isFullVerticalOverStatusBar = isFullVerticalOverStatusBar;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setDimAmount(float dimAmount) {
+            this.P.dimAmount = dimAmount;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setGravityAsWindow(DialogGravity gravityAsWindow) {
+            this.P.gravityAsWindow = gravityAsWindow;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setGravityAsView(DialogGravity gravityAsView) {
+            this.P.gravityAsView = gravityAsView;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setOffetX(int offsetX) {
+            this.P.offsetX = offsetX;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setOffetY(int offsetY) {
+            this.P.offsetY = offsetY;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder touchCancel(boolean touchCancel) {
+            this.P.touchCancel = touchCancel;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder backCancel(boolean backCancel) {
+            this.P.backCancel = backCancel;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder asView(boolean asView) {
+            this.P.asView = asView;
+            return this;
+        }
+
+        public BaseDialogFragment.Builder setAnchor(View anchor) {
+            this.anchor = anchor;
+            return this;
+        }
+
+        public BaseDialogFragment build() {
+            BaseDialogFragment dialog = new BaseDialogFragment();
+            dialog.setDialogFragmentOptions(this.P);
+            return dialog;
+        }
+
+        public BaseDialogFragment show(FragmentManager fragmentManager) {
+            BaseDialogFragment dialog = this.build();
+            if (this.P.asView && anchor != null) {
+                dialog.showOnView(fragmentManager, anchor);
+            } else {
+                dialog.showOnWindow(fragmentManager);
+            }
+            return dialog;
         }
     }
 

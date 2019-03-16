@@ -5,6 +5,7 @@ import android.view.Gravity;
 /**
  * Created by Mr.Q on 2019/3/5
  * 描述：
+ *      Dialog 定位
  */
 public enum  DialogGravity {
 
@@ -24,7 +25,24 @@ public enum  DialogGravity {
 
     RIGHT_CENTER(Gravity.END | Gravity.CENTER_VERTICAL),
 
-    RIGHT_BOTTOM(Gravity.END | Gravity.BOTTOM);
+    RIGHT_BOTTOM(Gravity.END | Gravity.BOTTOM),
+
+    // 下方为新拓展出来的展示方式
+    LEFT_ALIGN_TOP(0),
+
+    LEFT_ALIGN_BOTTOM(1),
+
+    TOP_ALIGN_LEFT(2),
+
+    TOP_ALIGN_RIGHT(3),
+
+    BOTTOM_ALIGN_LEFT(4),
+
+    BOTTOM_ALIGN_RIGHT(5),
+
+    RIGHT_ALIGN_TOP(6),
+
+    RIGHT_ALIGN_BOTTOM(7);
 
     // 成员变量
     private int layoutGravity;

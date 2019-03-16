@@ -5,4 +5,14 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginRight="16dp"
+        android:onClick="showDialog"
+        android:background="#BF8EF7"
+        android:textColor="#fff"
+        android:text="显示对话框" />
+
 </RelativeLayout>
